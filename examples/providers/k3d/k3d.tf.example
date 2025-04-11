@@ -1,0 +1,67 @@
+terraform {
+  required_providers {
+    k3d = {
+      source  = "hashicorp/k3d"
+      version = "0.1.3"
+    }
+  }
+}
+
+provider "k3d" {
+  kubernetes_version = "1.24.4-k3s1"
+  k3d_api_version    = "k3d.io/v1alpha4"
+  registry           = "rancher/k3s"
+  kind               = "Simple"
+  runtime            = "docker"
+}
+
+// Create node under already created cluster
+resource "k3d_node_create" "node-1" {
+    name     = "sample-node-2"
+    cluster  = "sample-cluster"
+    role     = "agent"
+    replicas = 1
+    memory   = "8g"
+    //  wait     = false
+    //  timeout  = 1
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.azure.kube_config.host
+    client_certificate     = base64decode(module.azure.kube_config.client_certificate)
+    client_key             = base64decode(module.azure.kube_config.client_key)
+    cluster_ca_certificate = base64decode(module.azure.kube_config.cluster_ca_certificate)
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.azure.kube_config.host
+  client_certificate     = base64decode(module.azure.kube_config.client_certificate)
+  client_key             = base64decode(module.azure.kube_config.client_key)
+  cluster_ca_certificate = base64decode(module.azure.kube_config.cluster_ca_certificate)
+}
+
+provider "argocd" {
+  port_forward = true
+  
+  username = "admin"
+  password = local.password
+  
+  kubernetes {
+    host                   = module.azure.kube_config.host
+    client_certificate     = base64decode(module.azure.kube_config.client_certificate)
+    client_key             = base64decode(module.azure.kube_config.client_key)
+    cluster_ca_certificate = base64decode(module.azure.kube_config.cluster_ca_certificate)
+  }
+}
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value = module.azure.resource_group_name
+}
+
+output "cluster_name" {
+  description = "Cluster name"
+  value = module.azure.cluster_name
+}

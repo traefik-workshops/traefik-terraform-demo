@@ -9,3 +9,9 @@ variable "enable_api_management" {
   type        = bool
   default     = false
 }
+
+variable "log_level" {
+  description = "Log level for Traefik Hub"
+  type        = string
+  default     = "INFO"
+}
