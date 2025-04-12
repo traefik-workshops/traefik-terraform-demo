@@ -2,4 +2,5 @@
 **/.terraform.*
 **/terraform.tfstate*
 
+k3d.tf
 azure.tf
