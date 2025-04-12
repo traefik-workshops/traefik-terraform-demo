@@ -4,6 +4,10 @@ terraform {
       source = "SneakyBugs/k3d"
       version = "1.0.1"
     }
+    argocd = {
+      source = "argoproj-labs/argocd"
+      version = "7.5.2"
+    }
   }
 }
 
@@ -17,13 +21,12 @@ metadata:
   name: traefik-demo
 servers: 1
 agents: 1
-
-# Disable the default Traefik ingress controller
-k3s:
-  extraArgs:
-    - arg: "--disable=traefik"
-      nodeFilters:
-        - server:*
+options:
+  k3s:
+    extraArgs:
+      - arg: "--disable=traefik"
+        nodeFilters:
+          - "server:*"
 EOF
 }
 
