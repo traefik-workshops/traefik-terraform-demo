@@ -16,8 +16,6 @@ resource "helm_release" "argocd" {
   namespace        = "argocd"
   create_namespace = true
 
-  timeout = 600
-
   set {
     name = "controller.readinessProbe.initialDelaySeconds"
     value = "30"
