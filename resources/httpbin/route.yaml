@@ -1,0 +1,27 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: httpbin-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /httpbin
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: httpbin-route
+  annotations:
+    hub.traefik.io/api: httpbin-api
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/httpbin`)
+      services:
+        - name: httpbin-svc
+          port: 8000
+      middlewares:
+        - name: httpbin-strip-prefix

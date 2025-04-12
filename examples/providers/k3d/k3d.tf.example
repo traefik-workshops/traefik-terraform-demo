@@ -13,7 +13,7 @@ terraform {
 
 resource "k3d_cluster" "traefik_demo" {
   name    = "traefik-demo"
-  # See https://k3d.io/v5.4.6/usage/configfile/#config-options
+  # See https://k3d.io/v5.8.3/usage/configfile/#config-options
   k3d_config = <<EOF
 apiVersion: k3d.io/v1alpha5
 kind: Simple
@@ -29,7 +29,6 @@ options:
           - "server:*"
 EOF
 }
-
 
 provider "helm" {
   kubernetes {

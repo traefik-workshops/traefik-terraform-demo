@@ -41,8 +41,14 @@ resource "argocd_application" "traefik" {
             }
             redis = var.enable_api_management ? {
               endpoints = "redis-master.traefik.svc:6379"
-              password = "topsecretpassword"
+              password = local.password
             } : {}
+          }
+
+          ingressRoute = {
+            dashboard = {
+              enabled = true
+            }
           }
 
           logs = {
@@ -72,7 +78,7 @@ resource "argocd_application" "traefik" {
             enabled = true
               http = {
                 enabled = true
-                endpoint = "http://prometheus.monitoring:9090/api/v1/otlp/v1/metrics"
+                endpoint = "http://traefik-prometheus-server.traefik-observability:80/api/v1/otlp/v1/metrics"
                 tls = {
                   insecureSkipVerify = true
                 }
@@ -85,7 +91,7 @@ resource "argocd_application" "traefik" {
               enabled = true
               http = {
                 enabled = true
-                endpoint = "http://zipkin.zipkin.svc.cluster.local:9411/api/v2/spans"
+                endpoint = "http://traefik-tempo.traefik-observability:4318/v1/traces"
                 tls = {
                   insecureSkipVerify = true
                 }
@@ -138,7 +144,7 @@ resource "argocd_application" "redis" {
         release_name = "redis"
         values = yamlencode({
           auth = {
-            password = "topsecretpassword"
+            password = local.password
           }
 
           replica = {

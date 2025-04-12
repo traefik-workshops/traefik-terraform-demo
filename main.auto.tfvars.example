@@ -1,0 +1,6 @@
+
+# Grafana observability stack
+enable_loki       = true
+enable_tempo      = true
+enable_prometheus = true
+enable_grafana    = true
