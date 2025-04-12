@@ -61,9 +61,78 @@ resource "argocd_application" "traefik_grafana" {
               ]
             }
           }
+
+          dashboardProviders = {
+            "dashboardproviders.yaml" = {
+              apiVersion = 1
+              providers = [
+                {
+                  name = "Hub API Management Dashboards"
+                  orgId = "1"
+                  folder = "Hub API Management"
+                  type = "file"
+                  updateIntervalSeconds = 10
+                  options = {
+                    path = "/dashboards/hub"
+                    foldersFromFilesStructure = false
+                  }
+                },
+                {
+                  name = "Flux Dashboards"
+                  orgId = "1"
+                  folder = "Flux"
+                  type = "file"
+                  updateIntervalSeconds = 10
+                  options = {
+                    path = "/dashboards/flux"
+                    foldersFromFilesStructure = false
+                  }
+                }
+              ]
+            }
+          }
+
+          extraConfigmapMounts = [
+            {
+              name = "grafana-hub-api-management"
+              mountPath = "/dashboards/hub/api-management.json"
+              subPath = "api-management.json"
+              configMap = "grafana-dashboards"
+              readOnly = true
+            },
+            {
+              name = "grafana-hub-api"
+              mountPath = "/dashboards/hub/api.json"
+              subPath = "api.json"
+              configMap = "grafana-dashboards"
+              readOnly = true
+            },
+            {
+              name = "grafana-hub-dashboard"
+              mountPath = "/dashboards/hub/hub-dashboard.json"
+              subPath = "hub-dashboard.json"
+              configMap = "grafana-dashboards"
+              readOnly = true
+            },
+            {
+              name = "grafana-hub-users"
+              mountPath = "/dashboards/hub/users.json"
+              subPath = "users.json"
+              configMap = "grafana-dashboards"
+              readOnly = true
+            },
+            {
+              name = "grafana-hub-control-plane"
+              mountPath = "/dashboards/flux/control-plane.json"
+              subPath = "control-plane.json"
+              configMap = "grafana-dashboards"
+              readOnly = true
+            }
+          ]
         })
       }
     }
   }
-}
 
+  depends_on = [kubernetes_config_map.grafana_dashboards]
+}
