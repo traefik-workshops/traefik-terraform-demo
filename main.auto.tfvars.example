@@ -4,3 +4,7 @@ enable_loki       = true
 enable_tempo      = true
 enable_prometheus = true
 enable_grafana    = true
+
+# New Relic observability stack
+enable_new_relic = true
+newrelic_license_key = ""

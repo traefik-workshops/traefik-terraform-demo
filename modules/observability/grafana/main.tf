@@ -54,7 +54,7 @@ resource "argocd_application" "traefik_grafana" {
                 {
                   name = "Loki"
                   type = "loki"
-                  url = "http://traefik-loki-stack:3100"
+                  url = "http://traefik-loki:3100"
                   access = "proxy"
                   isDefault = false
                 }

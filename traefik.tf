@@ -78,7 +78,7 @@ resource "argocd_application" "traefik" {
             enabled = true
               http = {
                 enabled = true
-                endpoint = "http://traefik-prometheus-server.traefik-observability:80/api/v1/otlp/v1/metrics"
+                endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/metrics"
                 tls = {
                   insecureSkipVerify = true
                 }
@@ -91,13 +91,21 @@ resource "argocd_application" "traefik" {
               enabled = true
               http = {
                 enabled = true
-                endpoint = "http://traefik-tempo.traefik-observability:4318/v1/traces"
+                endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/traces"
                 tls = {
                   insecureSkipVerify = true
                 }
               }
             }
           }
+
+          additionalArguments = [
+            "--experimental.otlpLogs=true",
+            "--log.otlp.http.tls.insecureSkipVerify=true",
+            "--log.otlp.http.endpoint=http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/logs",
+            "--accesslog.otlp.http.tls.insecureSkipVerify=true",
+            "--accesslog.otlp.http.endpoint=http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/logs"
+          ]
         })
       }
     }

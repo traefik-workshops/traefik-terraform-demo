@@ -1,6 +1,6 @@
-resource "argocd_application" "traefik_loki" {
+resource "argocd_application" "traefik_newrelic" {
   metadata {
-    name      = "traefik-loki"
+    name      = "traefik-newrelic"
     namespace = "argocd"
   }
 
@@ -26,17 +26,23 @@ resource "argocd_application" "traefik_loki" {
     }
 
     source {
-      repo_url        = "https://grafana.github.io/helm-charts"
-      chart           = "loki"
-      target_revision = "6.29.0"
+      repo_url        = "https://helm-charts.newrelic.com"
+      chart           = "nri-bundle"
+      target_revision = "5.0.119"
       helm {
-        release_name = "traefik-loki"
+        release_name = "traefik-newrelic"
         values = yamlencode({
-          deploymentMode = "SingleBinary"
-          loki = {
-            storage = {
-              type = "filesystem"
-            }
+          global = {
+            licenseKey = var.newrelic_license_key
+            cluster   = "traefik-demo"
+          }
+
+          newrelic-logging = {
+            enabled = true
+          }
+
+          kube-state-metrics = {
+            enabled = true
           }
         })
       }
