@@ -76,17 +76,6 @@ resource "argocd_application" "traefik_grafana" {
                     path = "/dashboards/hub"
                     foldersFromFilesStructure = false
                   }
-                },
-                {
-                  name = "Flux Dashboards"
-                  orgId = "1"
-                  folder = "Flux"
-                  type = "file"
-                  updateIntervalSeconds = 10
-                  options = {
-                    path = "/dashboards/flux"
-                    foldersFromFilesStructure = false
-                  }
                 }
               ]
             }
@@ -118,13 +107,6 @@ resource "argocd_application" "traefik_grafana" {
               name = "grafana-hub-users"
               mountPath = "/dashboards/hub/users.json"
               subPath = "users.json"
-              configMap = "grafana-dashboards"
-              readOnly = true
-            },
-            {
-              name = "grafana-hub-control-plane"
-              mountPath = "/dashboards/flux/control-plane.json"
-              subPath = "control-plane.json"
               configMap = "grafana-dashboards"
               readOnly = true
             }
