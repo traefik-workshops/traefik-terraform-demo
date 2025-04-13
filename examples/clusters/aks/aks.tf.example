@@ -1,0 +1,59 @@
+terraform {
+  required_providers {
+    argocd = {
+      source = "argoproj-labs/argocd"
+      version = "7.5.2"
+    }
+  }
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure subscription ID to use for the deployment"
+}
+
+module "aks" {
+  source = "git::https://github.com/traefik-workshops/traefik-terraform-azure-module.git//modules/aks?ref=main"
+
+  subscription_id = var.subscription_id
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.aks.kube_config.host
+    client_certificate     = base64decode(module.aks.kube_config.client_certificate)
+    client_key             = base64decode(module.aks.kube_config.client_key)
+    cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.aks.kube_config.host
+  client_certificate     = base64decode(module.aks.kube_config.client_certificate)
+  client_key             = base64decode(module.aks.kube_config.client_key)
+  cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
+}
+
+provider "argocd" {
+  port_forward = true
+  
+  username = "admin"
+  password = local.password
+  
+  kubernetes {
+    host                   = module.aks.kube_config.host
+    client_certificate     = base64decode(module.aks.kube_config.client_certificate)
+    client_key             = base64decode(module.aks.kube_config.client_key)
+    cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
+  }
+}
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value = module.aks.resource_group_name
+}
+
+output "cluster_name" {
+  description = "Cluster name"
+  value = module.aks.cluster_name
+}
