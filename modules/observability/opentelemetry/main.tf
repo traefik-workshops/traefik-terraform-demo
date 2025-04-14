@@ -1,3 +1,13 @@
+locals {
+  loki_exporter = var.enable_loki ? ["otlphttp/loki"] : []
+  tempo_exporter = var.enable_tempo ? ["otlphttp/tempo"] : []
+  newrelic_exporter = var.enable_new_relic ? ["otlphttp/nri"] : []
+  
+  log_exporters = concat(local.loki_exporter, local.newrelic_exporter)
+  trace_exporters = concat(local.tempo_exporter, local.newrelic_exporter)
+  metric_exporters = local.newrelic_exporter
+}
+
 resource "argocd_application" "traefik_opentelemetry" {
   metadata {
     name      = "traefik-opentelemetry"
@@ -61,6 +71,12 @@ resource "argocd_application" "traefik_opentelemetry" {
                 tls = {
                   insecure = true
                 }
+              },
+              "otlphttp/nri" = {
+                endpoint = "https://otlp.nr-data.net"
+                headers = {
+                  api-key = var.newrelic_license_key
+                }
               }
             }
             service = { 
@@ -68,16 +84,17 @@ resource "argocd_application" "traefik_opentelemetry" {
                 logs = {
                   receivers = ["otlp"],
                   processors = ["batch"],
-                  exporters = ["otlphttp/loki"]
+                  exporters = local.log_exporters
                 },
                 metrics = {
                   receivers = ["otlp"],
-                  processors = ["batch"]
+                  processors = ["batch"],
+                  exporters = local.metric_exporters
                 },
                 traces = {
                   receivers = ["otlp"],
                   processors = ["batch"],
-                  exporters = ["otlphttp/tempo"]
+                  exporters = local.trace_exporters
                 }
               }
             }

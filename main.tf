@@ -31,6 +31,12 @@ resource "helm_release" "argocd" {
 module "observability-opentelemetry" {
   source = "./modules/observability/opentelemetry"
 
+  newrelic_license_key = var.newrelic_license_key
+
+  enable_loki      = var.enable_loki
+  enable_tempo     = var.enable_tempo
+  enable_new_relic = var.enable_new_relic
+
   depends_on = [ helm_release.argocd ]
 }
 

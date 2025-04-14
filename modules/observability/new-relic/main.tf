@@ -37,11 +37,23 @@ resource "argocd_application" "traefik_newrelic" {
             cluster   = "traefik-demo"
           }
 
+          kube-state-metrics = {
+            enabled = true
+          }
+
+          nri-kube-events = {
+            enabled = true
+          }
+
           newrelic-logging = {
             enabled = true
           }
 
-          kube-state-metrics = {
+          newrelic-prometheus-agent = {
+            enabled = true
+          }
+
+          k8s-agents-operator = {
             enabled = true
           }
         })
