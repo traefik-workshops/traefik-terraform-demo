@@ -1,22 +1,33 @@
-output "tenant_id" {
-  sensitive = true
-  description = "The tenant ID of the Azure AD directory"
-  value       = var.enable_entraid ? module.security-entraid[0].tenant_id : null
+data "kubernetes_service" "traefik" {
+  metadata {
+    name = "traefik"
+    namespace = "traefik"
+  }
+
+  depends_on = [argocd_application.traefik]
 }
 
-output "client_id" {
-  sensitive   = true
-  description = "The client ID for the application"
-  value       = var.enable_entraid ? module.security-entraid[0].client_id : null
+output "traefik_ip" {
+  description = "The IP address of the Traefik ingress controller"
+  value       = data.kubernetes_service.traefik.status.0.load_balancer.0.ingress.0.ip
 }
 
-output "client_secret" {
-  sensitive   = true
-  description = "The client secret for the application"
-  value       = var.enable_entraid ? module.security-entraid[0].client_secret : null
+output "treafik_dashboard_url" {
+  description = "The URL of the Traefik dashboard"
+  value       = "http://dashboard.traefik:8080"
 }
 
-output "users" {
-  description = "List of users created in the security module"
-  value       = var.enable_entraid ? module.security-entraid[0].users : []
+output "treafik_prometheus_url" {
+  description = "The URL of the Prometheus dashboard"
+  value       = "http://prometheus.traefik:8080"
+}
+
+output "treafik_grafana_url" {
+  description = "The URL of the Grafana dashboard"
+  value       = "http://grafana.traefik:8080"
+}
+
+output "treafik_keycloak_url" {
+  description = "The URL of the Keycloak dashboard"
+  value       = "http://keycloak.traefik:8080"
 }

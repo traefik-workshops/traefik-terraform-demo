@@ -27,6 +27,12 @@ resource "argocd_application" "traefik" {
     }
 
     source {
+      repo_url        = "https://github.com/kubernetes-sigs/gateway-api.git"
+      path            = "config/crd/standard"
+      target_revision = "v1.1.0"
+    }
+
+    source {
       repo_url        = "https://traefik.github.io/charts"
       chart           = "traefik"
       target_revision = "35.0.0"
@@ -44,10 +50,39 @@ resource "argocd_application" "traefik" {
               password  = local.password
             } : {}
           }
-
           ingressRoute = {
             dashboard = {
               enabled = true
+              matchRule = "Host(`dashboard.traefik`)"
+            }
+          }
+
+          ports = {
+            traefik = {
+              expose = {
+                default = true
+              }
+            }
+          }
+
+          experimental = {
+            kubernetesGateway = {
+              enabled = true
+            }
+          }
+
+          gateway = {
+            listeners = {
+              web = {
+                port = 8000
+                protocol = "HTTP"
+                namespacePolicy = "All"
+              }
+              traefik = {
+                port = 8080
+                protocol = "HTTP"
+                namespacePolicy = "All"
+              }
             }
           }
 
@@ -70,6 +105,10 @@ resource "argocd_application" "traefik" {
             }
             kubernetesIngress = {
               allowExternalNameServices = true
+            }
+            kubernetesGateway = {
+              enabled = true
+              experimentalChannel = true
             }
           }
 
@@ -101,8 +140,8 @@ resource "argocd_application" "traefik" {
 
           additionalArguments = [
             "--experimental.otlpLogs=true",
-            "--log.otlp.http.tls.insecureSkipVerify=true",
-            "--log.otlp.http.endpoint=http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/logs",
+            # "--log.otlp.http.tls.insecureSkipVerify=true",
+            # "--log.otlp.http.endpoint=http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/logs",
             "--accesslog.otlp.http.tls.insecureSkipVerify=true",
             "--accesslog.otlp.http.endpoint=http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/logs"
           ]

@@ -35,3 +35,37 @@ resource "argocd_application" "traefik_prometheus" {
     }
   }
 }
+
+resource "kubernetes_manifest" "prometheus-traefik-httproute" {
+  manifest = {
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind = "HTTPRoute"
+    metadata = {
+      name = "prometheus"
+      namespace = "traefik-observability"
+    }
+    spec = {
+      parentRefs = [{
+        name = "traefik"
+        sectionName = "traefik"
+        kind = "Gateway"
+      }]
+      hostnames = ["prometheus.traefik"]
+      rules = [{
+        matches = [{
+          path = {
+            type = "PathPrefix"
+            value = "/"
+          }
+        }]
+        backendRefs = [{
+          name = "traefik-prometheus-server"
+          namespace = "traefik-observability"
+          port = 80
+        }]
+      }]
+    }
+  }
+
+  depends_on = [argocd_application.traefik_prometheus]
+}
