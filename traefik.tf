@@ -29,7 +29,7 @@ resource "argocd_application" "traefik" {
     source {
       repo_url        = "https://github.com/kubernetes-sigs/gateway-api.git"
       path            = "config/crd/standard"
-      target_revision = "v1.1.0"
+      target_revision = "v1.2.1"
     }
 
     source {
@@ -67,7 +67,7 @@ resource "argocd_application" "traefik" {
 
           experimental = {
             kubernetesGateway = {
-              enabled = true
+              enabled = false
             }
           }
 
@@ -107,8 +107,8 @@ resource "argocd_application" "traefik" {
               allowExternalNameServices = true
             }
             kubernetesGateway = {
-              enabled = true
-              experimentalChannel = true
+              enabled = false
+              experimentalChannel = false
             }
           }
 

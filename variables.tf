@@ -31,7 +31,7 @@ variable "azure_subscription_id" {
   default     = ""
 
   validation {
-    condition     = (var.cluster == "aks" && var.enable_entraid == false)|| var.azure_subscription_id != ""
+    condition     = (var.cluster != "aks" && var.enable_entraid == false) || var.azure_subscription_id != ""
     error_message = "Azure subscription ID is required when enable_entraid is true"
   }
 }

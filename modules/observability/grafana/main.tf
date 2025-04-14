@@ -119,34 +119,30 @@ resource "argocd_application" "traefik_grafana" {
   depends_on = [kubernetes_config_map.grafana_dashboards]
 }
 
-resource "kubernetes_manifest" "grafana-traefik-httproute" {
-  manifest = {
-    apiVersion = "gateway.networking.k8s.io/v1"
-    kind = "HTTPRoute"
-    metadata = {
-      name = "grafana"
-      namespace = "traefik-observability"
-    }
-    spec = {
-      parentRefs = [{
-        name = "traefik"
-        sectionName = "traefik"
-        kind = "Gateway"
-      }]
-      hostnames = ["grafana.traefik"]
-      rules = [{
-        matches = [{
-          path = {
-            type = "PathPrefix"
-            value = "/"
+
+resource "kubernetes_ingress_v1" "grafana-traefik" {
+  metadata {
+    name = "grafana"
+    namespace = "traefik-observability"
+  }
+
+  spec {
+    rule {
+      host = "grafana.traefik"
+      http {
+        path {
+          path = "/"
+          path_type = "Exact"
+          backend {
+            service {
+              name = "traefik-grafana"
+              port {
+                number = 80
+              }
+            }
           }
-        }]
-        backendRefs = [{
-          name = "traefik-grafana"
-          namespace = "traefik-observability"
-          port = 80
-        }]
-      }]
+        }
+      }
     }
   }
 
