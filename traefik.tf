@@ -107,7 +107,7 @@ resource "argocd_application" "traefik" {
               allowExternalNameServices = true
             }
             kubernetesGateway = {
-              enabled = false
+              enabled = true
               experimentalChannel = false
             }
           }

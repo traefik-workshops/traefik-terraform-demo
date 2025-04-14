@@ -2,18 +2,16 @@
 
 # Get the Traefik IP from terraform output
 TRAEFIK_IP=$(terraform output -raw traefik_ip)
-TRAEFIK_DASHBOARD_URL=$(terraform output -raw treafik_dashboard_url | sed 's|http://||' | sed 's|:8080||')
-TRAEFIK_GRAFANA_URL=$(terraform output -raw treafik_grafana_url | sed 's|http://||' | sed 's|:8080||')
-TRAEFIK_PROMETHEUS_URL=$(terraform output -raw treafik_prometheus_url | sed 's|http://||' | sed 's|:8080||')
-TRAEFIK_KEYCLOAK_URL=$(terraform output -raw treafik_keycloak_url | sed 's|http://||' | sed 's|:8080||')
 
-# Define the domains
-DOMAINS=(
-  "${TRAEFIK_IP} ${TRAEFIK_DASHBOARD_URL}"
-  "${TRAEFIK_IP} ${TRAEFIK_GRAFANA_URL}"
-  "${TRAEFIK_IP} ${TRAEFIK_PROMETHEUS_URL}"
-  "${TRAEFIK_IP} ${TRAEFIK_KEYCLOAK_URL}"
-)
+# Initialize empty DOMAINS array
+DOMAINS=()
+
+# Get the exposed URLs and convert to array
+while IFS= read -r url; do
+    # Extract hostname from URL (remove http:// and :8080 if present)
+    hostname=$(echo "$url" | sed 's|http://||' | sed 's|:8080||')
+    DOMAINS+=("${TRAEFIK_IP} ${hostname}")
+done < <(terraform output -json exposed_urls | jq -r '.[]')
 
 # Path to hosts file
 HOSTS_FILE="/etc/hosts"

@@ -1,0 +1,28 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: proxy-custom-header
+spec:
+  headers:
+    customRequestHeaders:
+      X-Custom-Header: "Hello Traefik"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: proxy-ratelimit
+spec:
+  rateLimit:
+    average: 1
+    burst: 5
+    period: 1s
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: httpbin-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /httpbin
