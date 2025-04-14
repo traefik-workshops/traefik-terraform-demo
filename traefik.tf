@@ -30,7 +30,7 @@ resource "argocd_application" "traefik" {
       repo_url        = "https://traefik.github.io/charts"
       chart           = "traefik"
       target_revision = "35.0.0"
-      
+
       helm {
         release_name = "traefik"
         values = yamlencode({
@@ -41,7 +41,7 @@ resource "argocd_application" "traefik" {
             }
             redis = var.enable_api_management ? {
               endpoints = "redis-master.traefik.svc:6379"
-              password = local.password
+              password  = local.password
             } : {}
           }
 
@@ -58,14 +58,14 @@ resource "argocd_application" "traefik" {
           }
 
           image = var.enable_api_gateway || var.enable_api_management ? {
-            registry = "ghcr.io"
+            registry   = "ghcr.io"
             repository = "traefik/traefik-hub"
-            tag = "v3.15.0"
+            tag        = "v3.15.0"
           } : {}
 
           providers = {
             kubernetesCRD = {
-              allowCrossNamespace = true
+              allowCrossNamespace       = true
               allowExternalNameServices = true
             }
             kubernetesIngress = {
@@ -75,9 +75,9 @@ resource "argocd_application" "traefik" {
 
           metrics = {
             otlp = {
-            enabled = true
+              enabled = true
               http = {
-                enabled = true
+                enabled  = true
                 endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/metrics"
                 tls = {
                   insecureSkipVerify = true
@@ -90,7 +90,7 @@ resource "argocd_application" "traefik" {
             otlp = {
               enabled = true
               http = {
-                enabled = true
+                enabled  = true
                 endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/traces"
                 tls = {
                   insecureSkipVerify = true
@@ -111,7 +111,7 @@ resource "argocd_application" "traefik" {
     }
   }
 
-  depends_on = [ helm_release.argocd, argocd_application.redis ]
+  depends_on = [helm_release.argocd, argocd_application.redis]
 }
 
 
@@ -147,7 +147,7 @@ resource "argocd_application" "redis" {
       repo_url        = "https://charts.bitnami.com/bitnami"
       chart           = "redis"
       target_revision = "19.6.4"
-      
+
       helm {
         release_name = "redis"
         values = yamlencode({
@@ -163,6 +163,6 @@ resource "argocd_application" "redis" {
     }
   }
 
-  depends_on = [ helm_release.argocd ]
-  count = var.enable_api_management ? 1 : 0
+  depends_on = [helm_release.argocd]
+  count      = var.enable_api_management ? 1 : 0
 }

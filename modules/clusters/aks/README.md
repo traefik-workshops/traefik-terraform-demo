@@ -1,7 +1,7 @@
 1. Deploy resources
 
 ```bash
-terraform apply -auto-approve -var="subscription_id=$(az account show --query id -o tsv)"
+terraform apply -auto-approve -var="azure_subscription_id=$(az account show --query id -o tsv)"
 ```
 
 2. Get AKS credentials and connect to the cluster

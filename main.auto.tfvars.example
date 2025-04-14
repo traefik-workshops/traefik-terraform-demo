@@ -1,3 +1,5 @@
+# Cluster
+cluster = "k3d"
 
 # Grafana observability stack
 enable_loki       = true
@@ -8,3 +10,7 @@ enable_grafana    = true
 # New Relic observability stack
 enable_new_relic = true
 newrelic_license_key = ""
+
+# Security modules
+enable_entraid = true
+enable_keycloak = true
