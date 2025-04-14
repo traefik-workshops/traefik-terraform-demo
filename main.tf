@@ -26,3 +26,35 @@ resource "helm_release" "argocd" {
     value = "false"
   }
 }
+
+resource "kubernetes_ingress_v1" "argocd-traefik" {
+  metadata {
+    name = "argocd"
+    namespace = "argocd"
+    annotations = {
+      "traefik.ingress.kubernetes.io/router.entrypoints" = "traefik"
+    }
+  }
+
+  spec {
+    rule {
+      host = "argocd.traefik"
+      http {
+        path {
+          path = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "argocd-server"
+              port {
+                number = 443
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd, argocd_application.traefik]
+}

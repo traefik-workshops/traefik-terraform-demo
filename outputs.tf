@@ -15,6 +15,7 @@ output "traefik_ip" {
 output "exposed_urls" {
   description = "The URL of the exposed services"
   value = [
+    "http://argocd.traefik:8080",
     "http://dashboard.traefik:8080",
     "http://prometheus.traefik:8080",
     "http://grafana.traefik:8080",
