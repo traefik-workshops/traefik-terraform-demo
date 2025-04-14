@@ -40,6 +40,9 @@ resource "kubernetes_ingress_v1" "prometheus-traefik" {
   metadata {
     name = "prometheus"
     namespace = "traefik-observability"
+    annotations = {
+      "traefik.ingress.kubernetes.io/router.entrypoints" = "traefik"
+    }
   }
 
   spec {
@@ -48,7 +51,7 @@ resource "kubernetes_ingress_v1" "prometheus-traefik" {
       http {
         path {
           path = "/"
-          path_type = "Exact"
+          path_type = "Prefix"
           backend {
             service {
               name = "traefik-prometheus-server"

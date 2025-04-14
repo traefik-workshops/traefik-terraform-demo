@@ -124,6 +124,9 @@ resource "kubernetes_ingress_v1" "grafana-traefik" {
   metadata {
     name = "grafana"
     namespace = "traefik-observability"
+    annotations = {
+      "traefik.ingress.kubernetes.io/router.entrypoints" = "traefik"
+    }
   }
 
   spec {
@@ -132,7 +135,7 @@ resource "kubernetes_ingress_v1" "grafana-traefik" {
       http {
         path {
           path = "/"
-          path_type = "Exact"
+          path_type = "Prefix"
           backend {
             service {
               name = "traefik-grafana"
