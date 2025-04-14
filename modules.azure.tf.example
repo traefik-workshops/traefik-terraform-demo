@@ -1,3 +1,33 @@
+provider "azurerm" {
+  features {}
+  subscription_id = var.azure_subscription_id
+}
+
+module "aks" {
+  source = "./modules/clusters/aks"
+
+  providers = {
+    azurerm = azurerm
+  }
+
+  azure_subscription_id = var.azure_subscription_id
+
+  count = var.cluster == "aks" ? 1 : 0
+}
+
+module "security-entraid" {
+  source = "./modules/security/entraid"
+
+  providers = {
+    azurerm = azurerm
+    azuread = azuread
+  }
+
+  users = var.users
+
+  count = var.enable_entraid ? 1 : 0
+}
+
 output "tenant_id" {
   sensitive = true
   description = "The tenant ID of the Azure AD directory"

@@ -5,16 +5,6 @@ module "k3d" {
   count = var.cluster == "k3d" ? 1 : 0
 }
 
-module "aks" {
-  source = "./modules/clusters/aks"
-
-  providers = {
-    azurerm = azurerm
-  }
-
-  count = var.cluster == "aks" ? 1 : 0
-}
-
 # Observability modules
 module "observability-opentelemetry" {
   source = "./modules/observability/opentelemetry"
@@ -59,19 +49,6 @@ module "observability-grafana" {
 }
 
 # Security modules
-module "security-entraid" {
-  source = "./modules/security/entraid"
-
-  providers = {
-    azurerm = azurerm
-    azuread = azuread
-  }
-
-  users = var.users
-
-  count = var.enable_entraid ? 1 : 0
-}
-
 module "security-keycloak" {
   source = "./modules/security/keycloak"
 
