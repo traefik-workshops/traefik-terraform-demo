@@ -30,6 +30,8 @@ resource "helm_release" "argocd" {
 # Observability modules
 module "observability-opentelemetry" {
   source = "./modules/observability/opentelemetry"
+
+  depends_on = [ helm_release.argocd ]
 }
 
 module "observability-grafana-loki" {

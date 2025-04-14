@@ -51,7 +51,7 @@ resource "argocd_application" "traefik_opentelemetry" {
             }
             exporters = {
               "otlphttp/loki" = {
-                endpoint = "http://traefik-loki.traefik-observability:3100/loki/api/v1/push"
+                endpoint = "http://traefik-loki.traefik-observability:3100/otlp"
                 tls = {
                   insecure = true
                 }
