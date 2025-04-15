@@ -1,3 +1,15 @@
+resource "kubernetes_secret" "traefik-hub-license" {
+  metadata {
+    name = "traefik-hub-license"
+    namespace = "traefik"
+  }
+
+  type = "Opaque"
+  data = {
+    token = var.traefik_license
+  }
+}
+
 # Install Traefik using ArgoCD
 resource "argocd_application" "traefik" {
   metadata {
@@ -150,7 +162,7 @@ resource "argocd_application" "traefik" {
     }
   }
 
-  depends_on = [helm_release.argocd, argocd_application.redis]
+  depends_on = [helm_release.argocd, argocd_application.redis, kubernetes_secret.traefik-hub-license]
 }
 
 

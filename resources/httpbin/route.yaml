@@ -3,6 +3,8 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: route-middleware
+  annotations:
+    hub.traefik.io/api: httpbin-api
 spec:
   chain:
     middlewares:
@@ -19,6 +21,20 @@ spec:
   routes:
     - kind: Rule
       match: Host(`httpbin.traefik`) || Host(`httpbin.traefik.localhost`)
+      services:
+        - name: httpbin-svc
+          port: 8000
+      middlewares:
+        - name: route-middleware
+    - kind: Rule
+      match: (Host(`gateway.traefik`) || Host(`gateway.traefik.localhost`)) && Header(`service`, `httpbin`)
+      services:
+        - name: httpbin-svc
+          port: 8000
+      middlewares:
+        - name: route-middleware
+    - kind: Rule
+      match: (Host(`gateway.traefik`) || Host(`gateway.traefik.localhost`)) && Query(`service`, `httpbin`)
       services:
         - name: httpbin-svc
           port: 8000

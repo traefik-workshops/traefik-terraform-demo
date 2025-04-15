@@ -25,6 +25,17 @@ variable "log_level" {
   default     = "INFO"
 }
 
+variable "traefik_license" {
+  description = "Traefik license key"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = (var.enable_api_gateway == false && var.enable_api_management == false) || var.traefik_license != ""
+    error_message = "Traefik license key is required when enable_api_gateway or enable_api_management is true"
+  }
+}
+
 variable "azure_subscription_id" {
   type        = string
   description = "Azure subscription ID to use for the deployment"

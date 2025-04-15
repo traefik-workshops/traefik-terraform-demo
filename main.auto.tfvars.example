@@ -1,6 +1,11 @@
 # Cluster
 cluster = "k3d"
 
+log_level = "INFO"
+traefik_license = ""
+enable_api_gateway = false
+enable_api_management = false
+
 # Grafana observability stack
 enable_loki       = true
 enable_tempo      = true
