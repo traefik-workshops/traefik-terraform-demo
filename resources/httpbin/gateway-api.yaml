@@ -21,6 +21,7 @@ spec:
       kind: Gateway
   hostnames:
     - "gateway.traefik"
+    - "gateway.traefik.localhost"
   rules:
     - matches:
         - path:

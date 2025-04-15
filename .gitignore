@@ -4,3 +4,5 @@
 
 azure.tf
 main.auto.tfvars
+
+modules.*.tf

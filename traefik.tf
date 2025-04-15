@@ -53,7 +53,7 @@ resource "argocd_application" "traefik" {
           ingressRoute = {
             dashboard = {
               enabled = true
-              matchRule = "Host(`dashboard.traefik`)"
+              matchRule = "Host(`dashboard.traefik`) || Host(`dashboard.traefik.localhost`)"
             }
           }
 

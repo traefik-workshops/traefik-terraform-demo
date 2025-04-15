@@ -7,7 +7,16 @@ kind: Simple
 metadata:
   name: traefik-demo
 servers: 1
-agents: 1
+ports:
+  - port: 8000:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8443:443
+    nodeFilters:
+      - loadbalancer
+  - port: 8080:8080
+    nodeFilters:
+      - loadbalancer
 options:
   k3s:
     extraArgs:

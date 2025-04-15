@@ -18,7 +18,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`httpbin.traefik`)
+      match: Host(`httpbin.traefik`) || Host(`httpbin.traefik.localhost`)
       services:
         - name: httpbin-svc
           port: 8000

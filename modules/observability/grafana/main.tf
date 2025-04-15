@@ -147,6 +147,23 @@ resource "kubernetes_ingress_v1" "grafana-traefik" {
         }
       }
     }
+    rule {
+      host = "grafana.traefik.localhost"
+      http {
+        path {
+          path = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "traefik-grafana"
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   depends_on = [argocd_application.traefik_grafana]

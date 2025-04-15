@@ -15,12 +15,12 @@ output "traefik_ip" {
 output "exposed_urls" {
   description = "The URL of the exposed services"
   value = [
-    "http://argocd.traefik:8080",
-    "http://dashboard.traefik:8080",
-    "http://prometheus.traefik:8080",
-    "http://grafana.traefik:8080",
-    "http://keycloak.traefik:8080",
-    "http://httpbin.traefik",
-    "http://gateway.traefik",
+    "http://argocd.traefik${var.cluster     == "k3d" ? ".localhost" : ""}:8080",
+    "http://dashboard.traefik${var.cluster  == "k3d" ? ".localhost" : ""}:8080",
+    "http://prometheus.traefik${var.cluster == "k3d" ? ".localhost" : ""}:8080",
+    "http://grafana.traefik${var.cluster    == "k3d" ? ".localhost" : ""}:8080",
+    "http://keycloak.traefik${var.cluster   == "k3d" ? ".localhost" : ""}:8080",
+    "http://httpbin.traefik${var.cluster    == "k3d" ? ".localhost" : ""}",
+    "http://gateway.traefik${var.cluster    == "k3d" ? ".localhost" : ""}",
   ]
 }
