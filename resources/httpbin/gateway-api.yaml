@@ -2,17 +2,18 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: gateway-api-middleware
+  name: httpbin-gateway-middleware
 spec:
   chain:
     middlewares:
     - name: proxy-custom-header
-    - name: proxy-ratelimit
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: httpbin-gateway-api
+  name: httpbin-gateway
+  annotations:
+    hub.traefik.io/api: httpbin-api
 spec:
   parentRefs:
     - name: traefik
@@ -23,11 +24,7 @@ spec:
     - "gateway.traefik"
     - "gateway.traefik.localhost"
   rules:
-    - matches:
-        - path:
-            type: PathPrefix 
-            value: "/httpbin"
-      backendRefs:
+    - backendRefs:
         - name: httpbin-svc
           port: 8000
       filters:
@@ -35,9 +32,4 @@ spec:
           extensionRef:
             group: traefik.io
             kind: Middleware
-            name: httpbin-stripprefix
-        - type: ExtensionRef
-          extensionRef:
-            group: traefik.io
-            kind: Middleware
-            name: gateway-api-middleware
+            name: httpbin-gateway-middleware
