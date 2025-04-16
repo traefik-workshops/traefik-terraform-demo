@@ -18,7 +18,7 @@ metadata:
 spec:
   plugin:
     jwt:
-      jwksUrl: http://keycloak-service.traefik-security.svc:8080/realms/keycloak-oauth/protocol/openid-connect/certs
+      jwksUrl: http://keycloak-service.traefik-security.svc:8080/realms/traefik/protocol/openid-connect/certs
       forwardHeaders:
         Group: group
 ---
