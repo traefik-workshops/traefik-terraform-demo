@@ -1,0 +1,38 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: add-internal-host-header
+spec:
+  headers:
+    customRequestHeaders:
+      Host: "app1.traefik.internal"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: jwt-claim-extraction-and-authentication
+spec:
+  plugin:
+    jwt:
+      jwksUrl: http://keycloak-service.traefik-security.svc:8080/realms/traefik/protocol/openid-connect/certs
+      forwardHeaders:
+        Group: group
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jwt-claim-route
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`app1.traefik`) || Host(`app1.traefik.localhost`)
+    services:
+    - name: traefik
+      namespace: traefik
+      port: 80
+    middlewares:
+    - name: jwt-claim-extraction-and-authentication
+    - name: add-internal-host-header

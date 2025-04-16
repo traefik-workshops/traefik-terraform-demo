@@ -126,4 +126,6 @@ module "security-keycloak" {
   users = var.users
 
   count = var.enable_keycloak ? 1 : 0
+
+  depends_on = [helm_release.argocd]
 }

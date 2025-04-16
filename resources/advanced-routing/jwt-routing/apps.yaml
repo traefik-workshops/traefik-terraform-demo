@@ -1,0 +1,174 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-script
+data:
+  app.py: |
+    import http.server
+    import json
+    import os
+    from http import HTTPStatus
+
+    class JSONHandler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            response = {
+                "message": os.environ.get("MESSAGE", "Default Message"),
+                "path": self.path
+            }
+            
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(response).encode())
+
+    if __name__ == "__main__":
+        server = http.server.HTTPServer(("", 8080), JSONHandler)
+        print("Starting server on port 8080...")
+        server.serve_forever()
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admins-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admins-app
+  template:
+    metadata:
+      labels:
+        app: admins-app
+    spec:
+      containers:
+      - name: server
+        image: python:3.9-alpine
+        command: ["python", "/app/app.py"]
+        env:
+        - name: MESSAGE
+          value: "This is the Admins Service"
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+        volumeMounts:
+        - name: app-script
+          mountPath: /app
+      volumes:
+      - name: app-script
+        configMap:
+          name: app-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admins-svc
+spec:
+  selector:
+    app: admins-app
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maintainers-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maintainers-app
+  template:
+    metadata:
+      labels:
+        app: maintainers-app
+    spec:
+      containers:
+      - name: server
+        image: python:3.9-alpine
+        command: ["python", "/app/app.py"]
+        env:
+        - name: MESSAGE
+          value: "This is the Maintainers Service"
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+        volumeMounts:
+        - name: app-script
+          mountPath: /app
+      volumes:
+      - name: app-script
+        configMap:
+          name: app-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maintainers-svc
+spec:
+  selector:
+    app: maintainers-app
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: else-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: else-app
+  template:
+    metadata:
+      labels:
+        app: else-app
+    spec:
+      containers:
+      - name: server
+        image: python:3.9-alpine
+        command: ["python", "/app/app.py"]
+        env:
+        - name: MESSAGE
+          value: "This is the Default Service"
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+        volumeMounts:
+        - name: app-script
+          mountPath: /app
+      volumes:
+      - name: app-script
+        configMap:
+          name: app-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: else-svc
+spec:
+  selector:
+    app: else-app
+  ports:
+  - port: 8080
+    targetPort: 8080

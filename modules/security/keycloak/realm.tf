@@ -15,7 +15,7 @@ spec:
         enabled         = true
         emailVerified   = true
         username        = username
-        email          = "${username}@example.com"
+        email          = "${username}@traefik.io"
         firstName      = title(username)
         lastName       = "Example"
         credentials    = [

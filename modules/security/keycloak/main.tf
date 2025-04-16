@@ -83,7 +83,7 @@ resource "kubernetes_secret" "traefik_keycloak_secret" {
 
   type = "Opaque"
   data = {
-    username = "admin"
+    username = "traefik"
     password = "topsecretpassword"
   }
 
