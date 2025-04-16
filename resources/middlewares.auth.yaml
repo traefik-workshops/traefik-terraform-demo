@@ -25,17 +25,26 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: test-opa
+  name: opa-authz
 spec:
   plugin:
     opa:
       policy: |
         package jwt.policies
 
+        default allow = false
+
+        token := io.jwt.decode(split(input.headers.Authorization, " ")[1])[1]
+
+        email := token["email"]
+        issuer := token["iss"]
+        domain := split(email, "@")[1]
+        realm := split(issuer, "/")[count(split(issuer, "/")) - 1]
+
         allow {
-          [_, encoded] := split(input.headers.Authorization, " ")
-          [header, payload, signature] = io.jwt.decode(encoded)
-          payload["email"] == "bibi@example.com"
+
         }
+        
       forwardHeaders:
-        Group: data.package.grp
+        Domain: data.jwt.policies.domain
+

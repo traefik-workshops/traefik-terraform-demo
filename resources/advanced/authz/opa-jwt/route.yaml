@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: admins-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: "Host(`opa.traefik`) || Host(`opa.traefik.localhost`)"
+      services:
+        - name: httpbin-svc
+          port: 8000
+      middlewares:
+        - name: keycloak-jwt-authentication
+        - name: opa-authz
