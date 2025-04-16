@@ -82,17 +82,17 @@ resource "argocd_application" "traefik_opentelemetry" {
             service = { 
               pipelines = {
                 logs = {
-                  receivers = ["otlp"],
+                  receivers = length(local.log_exporters) > 0 ? ["otlp"] : [],
                   processors = ["batch"],
                   exporters = local.log_exporters
                 },
                 metrics = {
-                  receivers = ["otlp"],
+                  receivers = length(local.metric_exporters) > 0 ? ["otlp"] : [],
                   processors = ["batch"],
                   exporters = local.metric_exporters
                 },
                 traces = {
-                  receivers = ["otlp"],
+                  receivers = length(local.trace_exporters) > 0 ? ["otlp"] : [],
                   processors = ["batch"],
                   exporters = local.trace_exporters
                 }
@@ -103,4 +103,5 @@ resource "argocd_application" "traefik_opentelemetry" {
       }
     }
   }
+  count = var.enable_loki || var.enable_tempo || var.enable_new_relic ? 1 : 0
 }

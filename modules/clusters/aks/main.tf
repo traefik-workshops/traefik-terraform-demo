@@ -1,37 +1,29 @@
-module "aks" {
-  providers = {
-    azurerm = azurerm
+resource "azurerm_resource_group" "traefik_demo" {
+  name     = "traefik-${var.cluster_location}"
+  location = var.cluster_location
+}
+
+resource "azurerm_kubernetes_cluster" "traefik_demo" {
+  name                = azurerm_resource_group.traefik_demo.name
+  location            = azurerm_resource_group.traefik_demo.location
+  kubernetes_version  = var.aks_version
+  resource_group_name = azurerm_resource_group.traefik_demo.name
+  dns_prefix          = replace(azurerm_resource_group.traefik_demo.name, "_", "-")
+
+  default_node_pool {
+    name       = "default"
+    node_count = 1
+    vm_size    = var.cluster_machine_type
   }
-  
-  source = "git::https://github.com/traefik-workshops/traefik-terraform-azure-module.git//modules/aks?ref=main"
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
-output "host" {
-  description = "AKS cluster host"
-  value = module.aks.kube_config.host
-}
-
-output "client_certificate" {
-  description = "AKS cluster client certificate"
-  value = base64decode(module.aks.kube_config.client_certificate)
-}
-
-output "client_key" {
-  description = "AKS cluster client key"
-  value = base64decode(module.aks.kube_config.client_key)
-}
-
-output "cluster_ca_certificate" {
-  description = "AKS cluster CA certificate"
-  value = base64decode(module.aks.kube_config.cluster_ca_certificate)
-}
-
-output "resource_group_name" {
-  description = "Resource group name"
-  value = module.aks.resource_group_name
-}
-
-output "cluster_name" {
-  description = "Cluster name"
-  value = module.aks.cluster_name
+resource "azurerm_kubernetes_cluster_node_pool" "traefik_demo" {
+  name                  = substr(replace(azurerm_resource_group.traefik_demo.name, "-", ""), 0, 12)
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.traefik_demo.id
+  vm_size               = var.cluster_machine_type
+  node_count            = var.cluster_node_count
 }

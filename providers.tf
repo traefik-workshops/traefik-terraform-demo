@@ -15,6 +15,10 @@ terraform {
       source  = "argoproj-labs/argocd"
       version = "7.5.2"
     }
+    kubectl = {
+      source = "gavinbunney/kubectl"
+      version = "1.19.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "4.25.0"
@@ -37,6 +41,13 @@ provider "helm" {
 }
 
 provider "kubernetes" {
+  host                   = local.host
+  client_certificate     = local.client_certificate
+  client_key             = local.client_key
+  cluster_ca_certificate = local.cluster_ca_certificate
+}
+
+provider "kubectl" {
   host                   = local.host
   client_certificate     = local.client_certificate
   client_key             = local.client_key
