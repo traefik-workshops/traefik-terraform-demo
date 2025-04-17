@@ -86,11 +86,11 @@ resource "argocd_application" "traefik_opentelemetry" {
                   processors = ["batch"],
                   exporters = local.log_exporters
                 },
-                metrics = {
-                  receivers = length(local.metric_exporters) > 0 ? ["otlp"] : [],
-                  processors = ["batch"],
-                  exporters = local.metric_exporters
-                },
+                # metrics = {
+                #   receivers = length(local.metric_exporters) > 0 ? ["otlp"] : [],
+                #   processors = ["batch"],
+                #   exporters = local.metric_exporters
+                # },
                 traces = {
                   receivers = length(local.trace_exporters) > 0 ? ["otlp"] : [],
                   processors = ["batch"],

@@ -89,6 +89,12 @@ resource "argocd_application" "traefik" {
             kubernetesGateway = {
               enabled = false
             }
+            plugins = {
+              headertoquery = {
+                moduleName = "github.com/zalbiraw/headertoquery"
+                version    = "v0.0.1"
+              }
+            }
           }
 
           gateway = {
@@ -132,18 +138,18 @@ resource "argocd_application" "traefik" {
             }
           }
 
-          metrics = {
-            otlp = {
-              enabled = true
-              http = {
-                enabled  = true
-                endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/metrics"
-                tls = {
-                  insecureSkipVerify = true
-                }
-              }
-            }
-          }
+          # metrics = {
+          #   otlp = {
+          #     enabled = true
+          #     http = {
+          #       enabled  = true
+          #       endpoint = "http://traefik-opentelemetry-opentelemetry-collector.traefik-observability:4318/v1/metrics"
+          #       tls = {
+          #         insecureSkipVerify = true
+          #       }
+          #     }
+          #   }
+          # }
 
           tracing = {
             otlp = {
@@ -170,9 +176,13 @@ resource "argocd_application" "traefik" {
     }
   }
 
-  depends_on = [helm_release.argocd, argocd_application.redis, kubernetes_secret.traefik-hub-license]
+  depends_on = [helm_release.argocd, argocd_application.redis, kubernetes_secret.traefik-hub-license, module.header_to_query]
 }
 
+module "header_to_query" {
+  source    = "github.com/zalbiraw/headertoquery?ref=v0.0.1"
+  namespace = "traefik"
+}
 
 # Install Redis using ArgoCD
 resource "argocd_application" "redis" {

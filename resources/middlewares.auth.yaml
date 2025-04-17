@@ -21,30 +21,30 @@ spec:
       jwksUrl: http://keycloak-service.traefik-security.svc:8080/realms/traefik/protocol/openid-connect/certs
       forwardHeaders:
         Group: group
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: opa-authz
-spec:
-  plugin:
-    opa:
-      policy: |
-        package jwt.policies
+# ---
+# apiVersion: traefik.io/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: opa-authz
+# spec:
+#   plugin:
+#     opa:
+#       policy: |
+#         package jwt.policies
 
-        default allow = false
+#         default allow = false
 
-        token := io.jwt.decode(split(input.headers.Authorization, " ")[1])[1]
+#         token := io.jwt.decode(split(input.headers.Authorization, " ")[1])[1]
 
-        email := token["email"]
-        issuer := token["iss"]
-        domain := split(email, "@")[1]
-        realm := split(issuer, "/")[count(split(issuer, "/")) - 1]
+#         email := token["email"]
+#         issuer := token["iss"]
+#         domain := split(email, "@")[1]
+#         realm := split(issuer, "/")[count(split(issuer, "/")) - 1]
 
-        allow {
+#         allow {
 
-        }
+#         }
         
-      forwardHeaders:
-        Domain: data.jwt.policies.domain
+#       forwardHeaders:
+#         Domain: data.jwt.policies.domain
 

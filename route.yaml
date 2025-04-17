@@ -1,0 +1,109 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: header-to-query
+spec:
+  plugin:
+    headertoquery:
+      headers:
+        - name: RANK
+          keepHeader: true
+        - name: SERVICE-TAG
+          value: id
+          keepHeader: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: httpbin-middleware
+  annotations:
+    hub.traefik.io/api: httpbin-api
+spec:
+  chain:
+    middlewares:
+    - name: header-to-query
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: httpbin-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`httpbin.traefik`) || Host(`httpbin.traefik.localhost`)
+      services:
+        - name: echo-app-svc
+          port: 8000
+      middlewares:
+        - name: httpbin-middleware
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: echo-app-config
+
+data:
+  echo-app.py: |
+    from flask import Flask, request, jsonify
+    
+    app = Flask(__name__)
+    
+    @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+    @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+    def echo(path):
+        return jsonify({
+            'method': request.method,
+            'path': request.path,
+            'headers': dict(request.headers),
+            'args': request.args.to_dict(flat=False),
+            'form': request.form.to_dict(flat=False),
+            'json': request.get_json(silent=True),
+            'data': request.get_data(as_text=True)
+        }), 200
+    
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=8000)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-app
+  template:
+    metadata:
+      labels:
+        app: echo-app
+    spec:
+      containers:
+      - name: echo-app
+        image: python:3.11-slim
+        command: ["sh", "-c", "pip install flask && python -u /app/echo-app.py"]
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: echo-app-src
+          mountPath: /app/echo-app.py
+          subPath: echo-app.py
+      volumes:
+      - name: echo-app-src
+        configMap:
+          name: echo-app-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-app-svc
+spec:
+  selector:
+    app: echo-app
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
