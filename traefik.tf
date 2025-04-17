@@ -92,6 +92,10 @@ resource "argocd_application" "traefik" {
             plugins = {
               headertoquery = {
                 moduleName = "github.com/zalbiraw/headertoquery"
+                version    = "v0.0.3"
+              }
+              jwtvalidator = {
+                moduleName = "github.com/zalbiraw/jwtvalidator"
                 version    = "v0.0.1"
               }
             }
@@ -176,12 +180,7 @@ resource "argocd_application" "traefik" {
     }
   }
 
-  depends_on = [helm_release.argocd, argocd_application.redis, kubernetes_secret.traefik-hub-license, module.header_to_query]
-}
-
-module "header_to_query" {
-  source    = "github.com/zalbiraw/headertoquery?ref=v0.0.1"
-  namespace = "traefik"
+  depends_on = [helm_release.argocd, argocd_application.redis, kubernetes_secret.traefik-hub-license]
 }
 
 # Install Redis using ArgoCD
